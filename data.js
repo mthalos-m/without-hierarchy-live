@@ -177,13 +177,13 @@ var parts = [
             {
                 num: "4",
                 title: "Why causation cannot be the cement of the universe",
-                thesis: "The prevailing conception of causation — efficient, local, probability-raising — is genuinely useful but cannot be the universal cement or lingua franca of the sciences; it can't represent asymmetrical dependence, modulation, or control. Hand “causation” to the clinic; the theory of science needs dependence, captured as protocols and control.",
+                thesis: "The prevailing conception of causation — efficient, local, probability-raising — is genuinely useful but cannot be the universal cement or lingua franca of the sciences; it can't represent asymmetrical dependence, modulation, or control. Causation belongs to the applied sciences, and within a larger suite of conceptions of how things hang together — protocols, control, and dependence — rather than standing alone as the glue of the world.",
                 page: "p. 127"
             },
             {
                 num: "5",
                 title: "Moves and movers: notes on the progress of science",
-                thesis: "With causation ceded to the clinic, turns to the sociology of science — how clinical versus theoretical motives “bend” it through conceptual moves. Via flocking (the coinage “boid” as a productive bridge between fields) and autism (a clinical label that may track no single real kind), argues science's task is responsiveness to the real network of dependences.",
+                thesis: "Turns to the sociology of science — how clinical versus theoretical motives can “bend” it through conceptual “moves.” Flocking research and its coinage “boid” show such a move working as a productive bridge between fields: the lesson is that science's task is responsiveness to the real network of dependences, and that terminological moves are legitimate, judged only by that responsiveness.",
                 page: "p. 154"
             },
             {
