@@ -2,16 +2,18 @@
    Without Hierarchy, Live — the two-pictures hero
    Steps the reader through four beats: the reductionist
    hierarchy dissolves into scale freedom, then resheathing.
+
+   Scroll-driven by default (a tall track with a pinned stage,
+   scroll position choosing the beat); the buttons, dots, and
+   arrow keys scroll to each beat. When the visitor prefers
+   reduced motion, it degrades to a plain button-driven stepper.
    ============================================================ */
 (function () {
     "use strict";
 
     var STACK_X = 340;
-    // stack centre-y per unit (top -> bottom), bottom unit is the master ontology
     var stackY  = [66, 118, 170, 222, 274];
-    // a small outward nudge at the "verdict" beat, as the levels start to part
     var detach  = [-24, 20, 28, -20, 8];
-    // scattered, overlapping positions for the scale-free picture
     var scatter = [[175, 235], [300, 265], [490, 240], [410, 140], [250, 170]];
 
     var beats = [
@@ -37,19 +39,23 @@
         }
     ];
 
-    var root   = document.getElementById("two-pictures");
-    var units  = Array.prototype.slice.call(root.querySelectorAll(".tp-unit"));
-    var sheath = root.querySelector(".u-sheath");
-    var beatEl = document.getElementById("tp-beat");
+    var root    = document.getElementById("two-pictures");
+    var track   = document.getElementById("tp-track");
+    var units   = Array.prototype.slice.call(root.querySelectorAll(".tp-unit"));
+    var sheath  = root.querySelector(".u-sheath");
+    var beatEl  = document.getElementById("tp-beat");
     var quoteEl = document.getElementById("tp-quote");
     var glossEl = document.getElementById("tp-gloss");
     var prevBtn = document.getElementById("tp-prev");
     var nextBtn = document.getElementById("tp-next");
     var dotsEl  = document.getElementById("tp-dots");
+    var hintEl  = document.getElementById("tp-scrollhint");
+
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var scrolly = !reduceMotion;   // scroll-driven only when motion is welcome
 
     var step = 0;
 
-    // build dots
     var dots = beats.map(function (b, i) {
         var d = document.createElement("button");
         d.className = "tp-dot";
@@ -59,6 +65,8 @@
         dotsEl.appendChild(d);
         return d;
     });
+
+    function clamp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
 
     function place(g, cx, cy) {
         g.style.transform = "translate(" + cx + "px, " + cy + "px)";
@@ -77,8 +85,8 @@
                 g.style.opacity = "1";
                 rect.style.opacity = "0";
                 oval.style.opacity = "1";
-                pulse.style.opacity = "";          // animation drives it
-                if (label) label.style.opacity = "0";
+                pulse.style.opacity = "";
+                if (label) { label.style.opacity = "0"; }
             } else {
                 var dx = step === 1 ? detach[i] : 0;
                 place(g, STACK_X + dx, stackY[i]);
@@ -86,7 +94,7 @@
                 rect.style.opacity = "1";
                 oval.style.opacity = "0";
                 pulse.style.opacity = "0";
-                if (label) label.style.opacity = "1";
+                if (label) { label.style.opacity = "1"; }
             }
         });
 
@@ -104,11 +112,50 @@
 
         prevBtn.disabled = step === 0;
         nextBtn.disabled = step === beats.length - 1;
+
+        if (hintEl) { hintEl.classList.toggle("show", scrolly && step === 0); }
+    }
+
+    function setStep(i) {
+        var next = clamp(i, 0, beats.length - 1);
+        if (next === step) { return; }
+        step = next;
+        render();
+    }
+
+    /* --- scroll-driven mode ----------------------------------- */
+    function beatScrollTarget(i) {
+        var absTop = track.getBoundingClientRect().top + window.pageYOffset;
+        var span = track.offsetHeight - window.innerHeight;
+        var progress = (i + 0.5) / beats.length;
+        return absTop + span * progress;
+    }
+
+    function beatFromScroll() {
+        var span = track.offsetHeight - window.innerHeight;
+        if (span <= 0) { return 0; }
+        var scrolled = -track.getBoundingClientRect().top;
+        var progress = clamp(scrolled / span, 0, 1);
+        return clamp(Math.floor(progress * beats.length), 0, beats.length - 1);
+    }
+
+    var ticking = false;
+    function onScroll() {
+        if (ticking) { return; }
+        ticking = true;
+        window.requestAnimationFrame(function () {
+            setStep(beatFromScroll());
+            ticking = false;
+        });
     }
 
     function go(i) {
-        step = Math.max(0, Math.min(beats.length - 1, i));
-        render();
+        var target = clamp(i, 0, beats.length - 1);
+        if (scrolly) {
+            window.scrollTo({ top: beatScrollTarget(target), behavior: reduceMotion ? "auto" : "smooth" });
+        } else {
+            setStep(target);
+        }
     }
 
     prevBtn.addEventListener("click", function () { go(step - 1); });
@@ -118,6 +165,13 @@
         if (e.key === "ArrowRight") { go(step + 1); }
         else if (e.key === "ArrowLeft") { go(step - 1); }
     });
+
+    if (scrolly && track) {
+        track.classList.add("tp-scrolly");
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll, { passive: true });
+        step = beatFromScroll();
+    }
 
     render();
 })();

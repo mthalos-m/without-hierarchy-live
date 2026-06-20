@@ -255,6 +255,36 @@ body {
 }
 .tp-figure { width: 100%; height: auto; display: block; }
 
+/* scroll-driven track: a tall scroll region with a pinned stage.
+   Enabled by JS (.tp-scrolly) only when motion is allowed; otherwise the
+   stage sits in normal flow and the buttons/dots drive the beats. */
+.tp-track { position: relative; }
+.tp-track.tp-scrolly { height: 340vh; }
+.tp-track.tp-scrolly .tp-sticky {
+    position: sticky;
+    top: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.tp-track.tp-scrolly .tp-stage { width: 100%; }
+
+.tp-scrollhint {
+    text-align: center;
+    margin: 1rem 0 0;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    opacity: 0;
+    transition: opacity 400ms;
+    pointer-events: none;
+}
+.tp-track.tp-scrolly .tp-scrollhint.show { opacity: 0.8; }
+@media (prefers-reduced-motion: reduce) {
+    .tp-scrollhint { transition: none; }
+}
+
 .tp-caption {
     text-align: center;
     max-width: 620px;
